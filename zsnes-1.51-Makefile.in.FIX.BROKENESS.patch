@@ -1,0 +1,18 @@
+diff -dur zsnes_1_51.orig/src/Makefile.in zsnes_1_51/src/Makefile.in
+--- zsnes_1_51.orig/src/Makefile.in	2007-02-03 17:10:13.000000000 +0100
++++ zsnes_1_51/src/Makefile.in	2007-02-03 17:18:00.000000000 +0100
+@@ -142,10 +142,10 @@
+ 	./autogen.sh --recheck
+ 
+ install:
+-	@INSTALL@ -d -m 0755 $(DESTDIR)/@prefix@/bin
+-	@INSTALL@ -m 0755 @ZSNESEXE@ $(DESTDIR)/@prefix@/bin
+-	@INSTALL@ -d -m 0755 $(DESTDIR)/@prefix@/man/man1
+-	@INSTALL@ -m 0644 linux/zsnes.1 $(DESTDIR)/@prefix@/man/man1
++	@INSTALL@ -d -m 0755 ${DESTDIR}/@bindir@
++	@INSTALL@ -m 0755 @ZSNESEXE@ ${DESTDIR}/@bindir@
++	@INSTALL@ -d -m 0755 ${DESTDIR}/@mandir@/man1
++	@INSTALL@ -m 0644 linux/zsnes.1 ${DESTDIR}/@mandir@/man1
+ uninstall:
+ 	rm -f @prefix@/bin/$(notdir @ZSNESEXE@) @prefix@/man/man1/zsnes.1
+ 
