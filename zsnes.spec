@@ -4,7 +4,7 @@
 Summary: ZSNES is a Super Nintendo emulator
 Name: zsnes
 Version: 1.51
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: GPLv2
 Group: Applications/Emulators
 URL: http://www.zsnes.com/
@@ -16,7 +16,9 @@ Patch2: zsnes-1.51-FORTIFY_SOURCE.patch
 # Paul Bender (minimyth)
 Patch3: zsnes-1.51-gcc43.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-ExclusiveArch: %{ix86}
+# This is to build only for i386 on plague
+#ExclusiveArch: %{ix86}
+ExclusiveArch: i386
 BuildRequires: automake
 BuildRequires: nasm
 BuildRequires: SDL-devel >= 1.2.0
@@ -118,6 +120,9 @@ fi
 %doc ../docs/readme.htm/ ../docs/readme.txt/
 
 %changelog
+* Tue Jul 22 2008 Andrea Musuruane <musuruan@gmail.com> 1.51-3
+- used a workaround to build only for i386 on plague
+
 * Fri Mar 21 2008 Andrea Musuruane <musuruan@gmail.com> 1.51-2
 - enabled libao
 - changed license due to new guidelines
