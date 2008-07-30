@@ -4,7 +4,7 @@
 Summary: ZSNES is a Super Nintendo emulator
 Name: zsnes
 Version: 1.51
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: GPLv2
 Group: Applications/Emulators
 URL: http://www.zsnes.com/
@@ -120,6 +120,9 @@ fi
 %doc ../docs/readme.htm/ ../docs/readme.txt/
 
 %changelog
+* Wed Jul 30 2008 Thorsten Leemhuis <fedora [AT] leemhuis [DOT] info - 1.51-4
+- rebuild for buildsys cflags issue
+
 * Tue Jul 22 2008 Andrea Musuruane <musuruan@gmail.com> 1.51-3
 - used a workaround to build only for i386 on plague
 
