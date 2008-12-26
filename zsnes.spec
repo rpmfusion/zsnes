@@ -4,7 +4,7 @@
 Summary: ZSNES is a Super Nintendo emulator
 Name: zsnes
 Version: 1.51
-Release: 4%{?dist}
+Release: 5%{?dist}
 License: GPLv2
 Group: Applications/Emulators
 URL: http://www.zsnes.com/
@@ -15,6 +15,8 @@ Patch1: zsnes-1.51-Makefile.in.FIX.BROKENESS.patch
 Patch2: zsnes-1.51-FORTIFY_SOURCE.patch
 # Paul Bender (minimyth)
 Patch3: zsnes-1.51-gcc43.patch
+# Upstream CVS
+Patch4: zsnes-1.51-pulseaudio.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 # This is to build only for i386 on plague
 #ExclusiveArch: %{ix86}
@@ -42,6 +44,7 @@ and to save the game state, even network play is possible.
 %patch1 -p2
 %patch2 -p2
 %patch3 -p2
+%patch4 -p2
 
 # Remove hardcoded CFLAGS and LDFLAGS
 sed -i \
@@ -120,6 +123,9 @@ fi
 %doc ../docs/readme.htm/ ../docs/readme.txt/
 
 %changelog
+* Wed Dec 24 2008 Andrea Musuruane <musuruan@gmail.com> 1.51-5
+- used an upstream patch to fix pulseaudio
+
 * Wed Jul 30 2008 Thorsten Leemhuis <fedora [AT] leemhuis [DOT] info - 1.51-4
 - rebuild for buildsys cflags issue
 
