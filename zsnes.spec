@@ -4,7 +4,7 @@
 Summary: ZSNES is a Super Nintendo emulator
 Name: zsnes
 Version: 1.51
-Release: 6%{?dist}
+Release: 7%{?dist}
 License: GPLv2
 Group: Applications/Emulators
 URL: http://www.zsnes.com/
@@ -18,13 +18,9 @@ Patch3: zsnes-1.51-gcc43.patch
 # Upstream CVS
 Patch4: zsnes-1.51-pulseaudio.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-# This is to build only for i386/i586 on plague
+# This is to build only for ix86 on plague
 #ExclusiveArch: %{ix86}
-%if 0%{?fedora} >= 11
-ExclusiveArch: i586
-%else
-ExclusiveArch: i386
-%endif
+ExclusiveArch: i686
 BuildRequires: automake
 BuildRequires: nasm
 BuildRequires: SDL-devel >= 1.2.0
@@ -127,6 +123,10 @@ fi
 %doc ../docs/readme.htm/ ../docs/readme.txt/
 
 %changelog
+* Sun Nov 07 2010 Andrea Musuruane <musuruan@gmail.com> 1.51-7
+- rebuilt due to libao soname bump
+- updated for F13+
+
 * Sat Mar 28 2009 Andrea Musuruane <musuruan@gmail.com> 1.51-6
 - fixed ExclusiveArch for F11
 
