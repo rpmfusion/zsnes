@@ -4,7 +4,7 @@
 Summary: ZSNES is a Super Nintendo emulator
 Name: zsnes
 Version: 1.51
-Release: 7%{?dist}
+Release: 8%{?dist}
 License: GPLv2
 Group: Applications/Emulators
 URL: http://www.zsnes.com/
@@ -31,6 +31,8 @@ BuildRequires: ncurses-devel
 BuildRequires: libao-devel
 BuildRequires: desktop-file-utils
 Requires: hicolor-icon-theme
+# Require pulseaudio-libs.i686 under x86_64
+Requires: pulseaudio-libs
 
 %description
 This is an emulator for Nintendo's 16 bit console, called Super Nintendo 
@@ -123,6 +125,9 @@ fi
 %doc ../docs/readme.htm/ ../docs/readme.txt/
 
 %changelog
+* Sun Sep 04 2011 Andrea Musuruane <musuruan@gmail.com> 1.51-8
+- fixed BZ #1926
+
 * Sun Nov 07 2010 Andrea Musuruane <musuruan@gmail.com> 1.51-7
 - rebuilt due to libao soname bump
 - updated for F13+
