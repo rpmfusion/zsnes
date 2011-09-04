@@ -1,10 +1,10 @@
 %define pkgversion %(echo %version|sed s/\\\\\.//)
 %define pkgsubdir %(echo %version|sed s/\\\\\./_/)
 
-Summary: ZSNES is a Super Nintendo emulator
+Summary: A Super Nintendo emulator
 Name: zsnes
 Version: 1.51
-Release: 8%{?dist}
+Release: 9%{?dist}
 License: GPLv2
 Group: Applications/Emulators
 URL: http://www.zsnes.com/
@@ -17,6 +17,8 @@ Patch2: zsnes-1.51-FORTIFY_SOURCE.patch
 Patch3: zsnes-1.51-gcc43.patch
 # Upstream CVS
 Patch4: zsnes-1.51-pulseaudio.patch
+# Hans de Goede
+Patch5: zsnes-1.51-parsegen.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 # This is to build only for ix86 on plague
 #ExclusiveArch: %{ix86}
@@ -47,6 +49,7 @@ and to save the game state, even network play is possible.
 %patch2 -p2
 %patch3 -p2
 %patch4 -p2
+%patch5 -p2
 
 # Remove hardcoded CFLAGS and LDFLAGS
 sed -i \
@@ -125,6 +128,10 @@ fi
 %doc ../docs/readme.htm/ ../docs/readme.txt/
 
 %changelog
+* Sun Sep 04 2011 Andrea Musuruane <musuruan@gmail.com> 1.51-9
+- fixed FTBFS with gcc 4.6.0 using a patch made by Hans De Goede
+- removed package name from summary
+
 * Sun Sep 04 2011 Andrea Musuruane <musuruan@gmail.com> 1.51-8
 - fixed BZ #1926
 
