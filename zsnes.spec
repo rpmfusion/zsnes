@@ -4,7 +4,7 @@
 Summary: A Super Nintendo emulator
 Name: zsnes
 Version: 1.51
-Release: 9%{?dist}
+Release: 10%{?dist}
 License: GPLv2
 Group: Applications/Emulators
 URL: http://www.zsnes.com/
@@ -17,8 +17,8 @@ Patch2: zsnes-1.51-FORTIFY_SOURCE.patch
 Patch3: zsnes-1.51-gcc43.patch
 # Upstream CVS
 Patch4: zsnes-1.51-pulseaudio.patch
-# Hans de Goede
-Patch5: zsnes-1.51-parsegen.patch
+# Ralf Corsepius
+Patch5: zsnes-1.51-psr.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 # This is to build only for ix86 on plague
 #ExclusiveArch: %{ix86}
@@ -128,6 +128,9 @@ fi
 %doc ../docs/readme.htm/ ../docs/readme.txt/
 
 %changelog
+* Sun Sep 18 2011 Andrea Musuruane <musuruan@gmail.com> 1.51-10
+- used a patch by Ralf Corsepius to fix issues with parsegen
+
 * Sun Sep 04 2011 Andrea Musuruane <musuruan@gmail.com> 1.51-9
 - fixed FTBFS with gcc 4.6.0 using a patch made by Hans De Goede
 - removed package name from summary
