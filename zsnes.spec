@@ -4,7 +4,7 @@
 Summary: A Super Nintendo emulator
 Name: zsnes
 Version: 1.51
-Release: 10%{?dist}
+Release: 11%{?dist}
 License: GPLv2
 Group: Applications/Emulators
 URL: http://www.zsnes.com/
@@ -19,6 +19,10 @@ Patch3: zsnes-1.51-gcc43.patch
 Patch4: zsnes-1.51-pulseaudio.patch
 # Ralf Corsepius
 Patch5: zsnes-1.51-psr.patch
+# Fix gamepad diagonals problem
+# http://board.zsnes.com/phpBB3/viewtopic.php?t=12544
+Patch6: zsnes-1.51-hat_events.patch
+
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 # This is to build only for ix86 on plague
 #ExclusiveArch: %{ix86}
@@ -50,6 +54,7 @@ and to save the game state, even network play is possible.
 %patch3 -p2
 %patch4 -p2
 %patch5 -p2
+%patch6 -p2
 
 # Remove hardcoded CFLAGS and LDFLAGS
 sed -i \
@@ -128,6 +133,9 @@ fi
 %doc ../docs/readme.htm/ ../docs/readme.txt/
 
 %changelog
+* Sat Nov 26 2011 Andrea Musuruane <musuruan@gmail.com> 1.51-11
+- fixed gamepad diagonals problem (BZ #1976)
+
 * Sun Sep 18 2011 Andrea Musuruane <musuruan@gmail.com> 1.51-10
 - used a patch by Ralf Corsepius to fix issues with parsegen
 
