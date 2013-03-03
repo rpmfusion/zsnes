@@ -4,7 +4,7 @@
 Summary: A Super Nintendo emulator
 Name: zsnes
 Version: 1.51
-Release: 12%{?dist}
+Release: 13%{?dist}
 License: GPLv2
 Group: Applications/Emulators
 URL: http://www.zsnes.com/
@@ -137,6 +137,9 @@ fi
 %doc ../docs/readme.htm/ ../docs/readme.txt/
 
 %changelog
+* Sun Mar 03 2013 Nicolas Chauvet <kwizart@gmail.com> - 1.51-13
+- Mass rebuilt for Fedora 19 Features
+
 * Sat Nov 26 2011 Andrea Musuruane <musuruan@gmail.com> 1.51-12
 - fixed FTBFS with libpng 1.5
 
