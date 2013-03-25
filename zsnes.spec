@@ -4,7 +4,7 @@
 Summary: A Super Nintendo emulator
 Name: zsnes
 Version: 1.51
-Release: 13%{?dist}
+Release: 15%{?dist}
 License: GPLv2
 Group: Applications/Emulators
 URL: http://www.zsnes.com/
@@ -25,8 +25,12 @@ Patch6: zsnes-1.51-hat_events.patch
 # Fix FTBFS with libpng 1.5
 # http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=649801
 Patch7: zsnes-1.51-libpng15.patch
+# Fix FTBFS with gcc 4.7
+# http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=667429
+Patch8: zsnes-1.51-gcc47.patch
+# Fix crash due to passing a non initialized ao_sample_format struct to libao
+Patch9: zsnes-1.51-libao-crash.patch
 
-BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 # This is to build only for ix86 on plague
 #ExclusiveArch: %{ix86}
 ExclusiveArch: i686
@@ -38,10 +42,11 @@ BuildRequires: libpng-devel >= 1.2.0
 BuildRequires: libGL-devel
 BuildRequires: ncurses-devel
 BuildRequires: libao-devel
+BuildRequires: perl-Carp
 BuildRequires: desktop-file-utils
 Requires: hicolor-icon-theme
 # Require pulseaudio-libs.i686 under x86_64
-Requires: pulseaudio-libs
+Requires: pulseaudio-libs%{?_isa}
 
 %description
 This is an emulator for Nintendo's 16 bit console, called Super Nintendo 
@@ -59,6 +64,8 @@ and to save the game state, even network play is possible.
 %patch5 -p2
 %patch6 -p2
 %patch7 -p2
+%patch8 -p2
+%patch9 -p2
 
 # Remove hardcoded CFLAGS and LDFLAGS
 sed -i \
@@ -80,23 +87,26 @@ mv ../docs/readme.txt/support.txt.utf8 ../docs/readme.txt/support.txt
 sed -i -e 's/^Icon=%{name}.png$/Icon=%{name}/g' \
   linux/%{name}.desktop
 
+
 %build
 aclocal
 autoconf
 %configure \
   --enable-libao \
   --enable-release \
-  --disable-cpucheck force_arch="%{_arch}"
+  --disable-cpucheck force_arch=i686
 make %{?_smp_mflags}
 
+
 %install
-rm -rf %{buildroot}
 make install DESTDIR=%{buildroot}
 
 # install desktop file
 mkdir -p %{buildroot}%{_datadir}/applications
 desktop-file-install \
+%if 0%{?fedora} && 0%{?fedora} < 19
   --vendor dribble \
+%endif
   --remove-category Application \
   --dir %{buildroot}%{_datadir}/applications \
   linux/%{name}.desktop
@@ -108,26 +118,24 @@ install -m 644 icons/32x32x32.png %{buildroot}%{_datadir}/icons/hicolor/32x32/ap
 install -m 644 icons/48x48x32.png %{buildroot}%{_datadir}/icons/hicolor/48x48/apps/zsnes.png
 install -m 644 icons/64x64x32.png %{buildroot}%{_datadir}/icons/hicolor/64x64/apps/zsnes.png
 
-%clean
-rm -rf %{buildroot}
 
 %post
-touch --no-create %{_datadir}/icons/hicolor
-if [ -x %{_bindir}/gtk-update-icon-cache ]; then
-    %{_bindir}/gtk-update-icon-cache --quiet %{_datadir}/icons/hicolor || :
-fi
+touch --no-create %{_datadir}/icons/hicolor &>/dev/null || :
 
 %postun
-touch --no-create %{_datadir}/icons/hicolor
-if [ -x %{_bindir}/gtk-update-icon-cache ]; then
-    %{_bindir}/gtk-update-icon-cache --quiet %{_datadir}/icons/hicolor || :
+if [ $1 -eq 0 ] ; then
+    touch --no-create %{_datadir}/icons/hicolor &>/dev/null
+    gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 fi
 
+%posttrans
+gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
+
+
 %files
-%defattr(-,root,root)
 %{_bindir}/zsnes
 %{_mandir}/man1/zsnes.1*
-%{_datadir}/applications/dribble-%{name}.desktop
+%{_datadir}/applications/*%{name}.desktop
 %{_datadir}/icons/hicolor/16x16/apps/%{name}.png
 %{_datadir}/icons/hicolor/32x32/apps/%{name}.png
 %{_datadir}/icons/hicolor/48x48/apps/%{name}.png
@@ -136,7 +144,16 @@ fi
 %doc ../docs/support.txt ../docs/thanks.txt ../docs/todo.txt
 %doc ../docs/readme.htm/ ../docs/readme.txt/
 
+
 %changelog
+* Mon Mar 25 2013 Hans de Goede <j.w.r.degoede@gmail.com> - 1.51-15
+- Pass -march=i686 rather then -march=i386 to gcc (fix FTBFS)
+- Modernize specfile a bit
+- Fix crash due to passing a non initialized ao_sample_format struct to libao
+
+* Sun Mar 24 2013 Andrea Musuruane <musuruan@gmail.com> - 1.51-14
+- Fixed FTBFS with gcc 4.7+
+
 * Sun Mar 03 2013 Nicolas Chauvet <kwizart@gmail.com> - 1.51-13
 - Mass rebuilt for Fedora 19 Features
 
