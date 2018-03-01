@@ -4,7 +4,7 @@
 Summary: A Super Nintendo emulator
 Name: zsnes
 Version: 1.51
-Release: 18%{?dist}
+Release: 19%{?dist}
 License: GPLv2
 Group: Applications/Emulators
 URL: http://www.zsnes.com/
@@ -146,6 +146,9 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 
 
 %changelog
+* Thu Mar 01 2018 RPM Fusion Release Engineering <leigh123linux@googlemail.com> - 1.51-19
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_28_Mass_Rebuild
+
 * Thu Aug 31 2017 RPM Fusion Release Engineering <kwizart@rpmfusion.org> - 1.51-18
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_27_Mass_Rebuild
 
