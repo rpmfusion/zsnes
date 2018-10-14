@@ -4,7 +4,7 @@
 Summary: A Super Nintendo emulator
 Name: zsnes
 Version: 1.51
-Release: 22%{?dist}
+Release: 23%{?dist}
 License: GPLv2
 URL: http://www.zsnes.com/
 Source: http://dl.sf.net/%{name}/%{name}%{pkgversion}src.tar.bz2
@@ -36,7 +36,7 @@ Patch10: zsnes-1.51-freeze_on_exit.patch
 # This is to build only for ix86 on plague
 #ExclusiveArch: %{ix86}
 ExclusiveArch: i686
-BuildRequires: gcc
+BuildRequires: gcc-c++
 BuildRequires: automake
 BuildRequires: nasm
 BuildRequires: SDL-devel >= 1.2.0
@@ -136,6 +136,9 @@ done
 
 
 %changelog
+* Sun Oct 14 2018 Andrea Musuruane <musuruan@gmail.com> - 1.51-23
+- Added gcc-c++ dependency
+
 * Sun Oct 14 2018 Andrea Musuruane <musuruan@gmail.com> - 1.51-22
 - Added a patch to fix freeze on exit (#5036)
 - Added gcc dependency
