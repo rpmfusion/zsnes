@@ -4,9 +4,8 @@
 Summary: A Super Nintendo emulator
 Name: zsnes
 Version: 1.51
-Release: 21%{?dist}
+Release: 22%{?dist}
 License: GPLv2
-Group: Applications/Emulators
 URL: http://www.zsnes.com/
 Source: http://dl.sf.net/%{name}/%{name}%{pkgversion}src.tar.bz2
 # Source Mage
@@ -30,10 +29,14 @@ Patch7: zsnes-1.51-libpng15.patch
 Patch8: zsnes-1.51-gcc47.patch
 # Fix crash due to passing a non initialized ao_sample_format struct to libao
 Patch9: zsnes-1.51-libao-crash.patch
+# Fix freeze on exit
+# https://bugzilla.rpmfusion.org/show_bug.cgi?id=5036
+Patch10: zsnes-1.51-freeze_on_exit.patch
 
 # This is to build only for ix86 on plague
 #ExclusiveArch: %{ix86}
 ExclusiveArch: i686
+BuildRequires: gcc
 BuildRequires: automake
 BuildRequires: nasm
 BuildRequires: SDL-devel >= 1.2.0
@@ -66,6 +69,7 @@ and to save the game state, even network play is possible.
 %patch7 -p2
 %patch8 -p2
 %patch9 -p2
+%patch10 -p0
 
 # Remove hardcoded CFLAGS and LDFLAGS
 sed -i \
@@ -95,41 +99,26 @@ autoconf
   --enable-libao \
   --enable-release \
   --disable-cpucheck force_arch=i686
-make %{?_smp_mflags}
+%make_build
 
 
 %install
-make install DESTDIR=%{buildroot}
+%make_install
 
 # install desktop file
-mkdir -p %{buildroot}%{_datadir}/applications
+install -d -m 755 %{buildroot}%{_datadir}/applications
 desktop-file-install \
-%if 0%{?fedora} && 0%{?fedora} < 19
-  --vendor dribble \
-%endif
+  --remove-key Path \
   --remove-category Application \
   --dir %{buildroot}%{_datadir}/applications \
   linux/%{name}.desktop
 
 # install icons
-mkdir -p %{buildroot}%{_datadir}/icons/hicolor/{16x16,32x32,48x48,64x64}/apps
-install -m 644 icons/16x16x32.png %{buildroot}%{_datadir}/icons/hicolor/16x16/apps/zsnes.png
-install -m 644 icons/32x32x32.png %{buildroot}%{_datadir}/icons/hicolor/32x32/apps/zsnes.png
-install -m 644 icons/48x48x32.png %{buildroot}%{_datadir}/icons/hicolor/48x48/apps/zsnes.png
-install -m 644 icons/64x64x32.png %{buildroot}%{_datadir}/icons/hicolor/64x64/apps/zsnes.png
-
-
-%post
-touch --no-create %{_datadir}/icons/hicolor &>/dev/null || :
-
-%postun
-if [ $1 -eq 0 ] ; then
-    touch --no-create %{_datadir}/icons/hicolor &>/dev/null
-    gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
-fi
-
-%posttrans
-gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
+for i in 16 32 48 64; do
+  install -d -m 755 %{buildroot}%{_datadir}/icons/hicolor/${i}x${i}/apps
+  install -m 644 icons/${i}x${i}x32.png \
+    %{buildroot}%{_datadir}/icons/hicolor/${i}x${i}/apps/%{name}.png
+done
 
 
 %files
@@ -140,12 +129,21 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 %{_datadir}/icons/hicolor/32x32/apps/%{name}.png
 %{_datadir}/icons/hicolor/48x48/apps/%{name}.png
 %{_datadir}/icons/hicolor/64x64/apps/%{name}.png
-%doc ../docs/authors.txt ../docs/license.txt ../docs/README.LINUX
+%doc ../docs/authors.txt ../docs/README.LINUX
 %doc ../docs/support.txt ../docs/thanks.txt ../docs/todo.txt
 %doc ../docs/readme.htm/ ../docs/readme.txt/
+%license ../docs/license.txt
 
 
 %changelog
+* Sun Oct 14 2018 Andrea Musuruane <musuruan@gmail.com> - 1.51-22
+- Added a patch to fix freeze on exit (#5036)
+- Added gcc dependency
+- Removed Group tag
+- Removed desktop scriptlets
+- Added license tag
+- Minor improvements
+
 * Sun Aug 19 2018 Leigh Scott <leigh123linux@googlemail.com> - 1.51-21
 - Rebuilt for Fedora 29 Mass Rebuild binutils issue
 

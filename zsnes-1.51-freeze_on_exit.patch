@@ -1,0 +1,38 @@
+--- linux/audio.c.debug	2018-09-28 23:10:39.850825458 +0900
++++ linux/audio.c	2018-09-29 00:33:07.020293976 +0900
+@@ -37,6 +37,7 @@ static pthread_mutex_t audio_mutex = PTH
+ static pthread_cond_t audio_wait = PTHREAD_COND_INITIALIZER;
+ static ao_device *audio_device = 0;
+ static volatile unsigned int samples_waiting = 0;
++static volatile unsigned int samples_terminating = 0;
+ #endif
+ 
+ unsigned char *sdl_audio_buffer = 0;
+@@ -146,7 +147,7 @@ static void *SoundThread_ao(void *useles
+     pthread_mutex_lock(&audio_mutex);
+ 
+     //The while() is there to prevent error codes from breaking havoc
+-    while (!samples_waiting)
++    while (!samples_waiting && !samples_terminating)
+     {
+       pthread_cond_wait(&audio_wait, &audio_mutex); //Wait for signal
+     }
+@@ -155,6 +156,7 @@ static void *SoundThread_ao(void *useles
+     samples_waiting = 0;
+     pthread_mutex_unlock(&audio_mutex);
+ 
++    if (samples_terminating) break;
+     SoundWriteSamples_ao(samples);
+   }
+   return(0);
+@@ -338,8 +340,10 @@ void DeinitSound()
+   #ifdef __LIBAO__
+   if (audio_device)
+   {
++    samples_terminating = 1;
+     pthread_kill(audio_thread, SIGTERM);
+     pthread_mutex_destroy(&audio_mutex);
++    pthread_cond_broadcast(&audio_wait);
+     pthread_cond_destroy(&audio_wait);
+     ao_close(audio_device);
+   }
