@@ -1,10 +1,12 @@
+%define _legacy_common_support 1
+
 %define pkgversion %(echo %version|sed s/\\\\\.//)
 %define pkgsubdir %(echo %version|sed s/\\\\\./_/)
 
 Summary: A Super Nintendo emulator
 Name: zsnes
 Version: 1.51
-Release: 26%{?dist}
+Release: 27%{?dist}
 License: GPLv2
 URL: http://www.zsnes.com/
 Source: http://dl.sf.net/%{name}/%{name}%{pkgversion}src.tar.bz2
@@ -136,6 +138,9 @@ done
 
 
 %changelog
+* Sat Apr 25 2020 Andrea Musuruane <musuruan@gmail.com> - 1.51-27
+- Fixed FTBFS for F32
+
 * Wed Feb 05 2020 RPM Fusion Release Engineering <leigh123linux@gmail.com> - 1.51-26
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
 
