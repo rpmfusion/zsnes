@@ -1,12 +1,10 @@
-%define _legacy_common_support 1
-
 %define pkgversion %(echo %version|sed s/\\\\\.//)
 %define pkgsubdir %(echo %version|sed s/\\\\\./_/)
 
 Summary: A Super Nintendo emulator
 Name: zsnes
 Version: 1.51
-Release: 27%{?dist}
+Release: 28%{?dist}
 License: GPLv2
 URL: http://www.zsnes.com/
 Source: http://dl.sf.net/%{name}/%{name}%{pkgversion}src.tar.bz2
@@ -34,6 +32,13 @@ Patch9: zsnes-1.51-libao-crash.patch
 # Fix freeze on exit
 # https://bugzilla.rpmfusion.org/show_bug.cgi?id=5036
 Patch10: zsnes-1.51-freeze_on_exit.patch
+# Fix FTBFS with gcc 10
+# Gentoo
+Patch11: zsnes-1.51-gcc10.patch
+# Fix segfault when selecting game on F32
+# Mamoru TASAKA
+# https://bugzilla.rpmfusion.org/show_bug.cgi?id=5651
+Patch12: zsnes-1.51-FORTIFY_SOURCE_2.patch
 
 # This is to build only for ix86 on plague
 #ExclusiveArch: %{ix86}
@@ -72,6 +77,8 @@ and to save the game state, even network play is possible.
 %patch8 -p2
 %patch9 -p2
 %patch10 -p0
+%patch11 -p1
+%patch12 -p2
 
 # Remove hardcoded CFLAGS and LDFLAGS
 sed -i \
@@ -138,6 +145,11 @@ done
 
 
 %changelog
+* Sat May 23 2020 Andrea Musuruane <musuruan@gmail.com> - 1.51-28
+- Added a patch from Gentoo to fix duplicate symbol errors when building with
+  -fno-common
+- Added a patch to fix a buffer overflow on F32 when selectinig a game (#5651)
+
 * Sat Apr 25 2020 Andrea Musuruane <musuruan@gmail.com> - 1.51-27
 - Fixed FTBFS for F32
 

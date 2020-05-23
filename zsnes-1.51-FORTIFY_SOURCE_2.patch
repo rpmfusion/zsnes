@@ -1,0 +1,106 @@
+From e528bdd4d365fb1aaef3330f8fabc3b76607a1fd Mon Sep 17 00:00:00 2001
+From: Mamoru TASAKA <mtasaka@fedoraproject.org>
+Date: Tue, 19 May 2020 23:25:14 +0900
+Subject: [PATCH] Unspecify the size of SPCRAM to make memset happy with glibc
+ _FORTIFY_SOURCE
+
+With the current source, zsnes abort()s when compiled with glibc 2.31 and when compiled with -Wp,-D_FORTIFY_SOURCE=2, when
+
+*  launch zsnes
+*  Choose "GAME" -> "LOAD"
+*  Select one game in "FILENAME"
+
+The backtrace shows:
+
+*** buffer overflow detected ***: terminated
+
+Thread 1 "zsnes" received signal SIGABRT, Aborted.
+0xf7fd0ee9 in __kernel_vsyscall ()
+(gdb) bt
+#0  0xf7fd0ee9 in __kernel_vsyscall ()
+#1  0xf7930566 in raise () from /lib/libc.so.6
+#2  0xf79183b5 in abort () from /lib/libc.so.6
+#3  0xf7976c4c in __libc_message () from /lib/libc.so.6
+#4  0xf7a002cc in __fortify_fail () from /lib/libc.so.6
+#5  0xf79fed2f in __chk_fail () from /lib/libc.so.6
+#6  0x566fe6c7 in memcpy (__len=65856, __src=<optimized out>, __dest=<optimized out>) at /usr/include/bits/string_fortified.h:34
+#7  memcpyrinc (len=65856, dest=<optimized out>, src=0xffffcd28) at zstate.c:315
+#8  copy_spc_data (copy_func=0x566fdc60 <memcpyrinc>, buffer=0xffffcd28) at zstate.c:108
+#9  RestoreSystemVars () at zstate.c:532
+#10 0x5677a8f3 in GUIDoReset ()
+#11 0x569d149c in tempdat ()
+#12 0x569a1f56 in regsbackup ()
+#13 0x00000001 in ?? ()
+#14 0xffffcd74 in ?? ()
+(gdb) up
+....
+#7  memcpyrinc (len=65856, dest=<optimized out>, src=0xffffcd28) at zstate.c:315
+315       memcpy(dest, *src, len);
+(gdb) up
+#8  copy_spc_data (copy_func=0x566fdc60 <memcpyrinc>, buffer=0xffffcd28) at zstate.c:108
+108       copy_func(buffer, SPCRAM, PHspcsave);
+(gdb) ptypep buffer
+$1 = (unsigned char **) 0xffffcd28
+(gdb) ptype SPCRAM
+type = unsigned char [65472]
+(gdb) p PHspcsave
+$6 = 65856
+(gdb) ptype PHspcsave
+type = unsigned int
+
+So here program is trying to memcpy() 65856 bytes from "buffer" to "SPCRAM" (which is 65472 bytes),
+which is rejected by glibc _FORTIFY_SOURCE .
+
+The size "65856 bytes" actually comes from cpu/spc700.asm:
+    45  NEWSYM SPCRAM,   times 65472 db 0FFh  ; Pointer to the SPC's RAM
+    48     db 0CDh,0EFh,0BDh,0E8h,000h,0C6h,01Dh,0D0h,0FCh,08Fh,0AAh,0F4h,08Fh,0BBh,0F5h,078h
+    49     db 0CCh,0F4h,0D0h,0FBh,02Fh,019h,0EBh,0F4h,0D0h,0FCh,07Eh,0F4h,0D0h,00Bh,0E4h,0F5h
+....
+....
+   110  NEWSYM FutureExpandS,  times 256-64 db 0
+   112  spcsave equ $-SPCRAM
+   114  NEWSYM PHspcsave, dd spcsave
+
+So at the line 112, the difference of the address "$" (current address) and "SPCRAM" symbol
+is actually:
+   65472 + 16 * 5 + 4 + 20 + 4 * 3 + 12 + 64 + (256 - 64) = 65856 (bytes)
+and at the line 114, "PHspcsave" symbol has the value 65856.
+
+Now going back to copy_spc_data(), it seems that the program actually wants to copy data
+from "buffer" by 65856 bytes, i.e. from "SPCRAM" to FutureExpandS.
+So to make memcpy() makes happy with _FORTIFY_SOURCE, just tell memcpy() that SPCRAM[] is
+char array with some unknown size, not telling the size as 65472.
+---
+ src/gblvars.h | 2 +-
+ src/initc.c   | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/gblvars.h b/src/gblvars.h
+index a43b8da..d41d134 100644
+--- a/src/gblvars.h
++++ b/src/gblvars.h
+@@ -33,7 +33,7 @@ extern unsigned int nmirept, nmiprevline, nmistatus, joycontren;
+ extern unsigned int SfxR0, *setaramdata, ramsize, *sram, nmiprevaddrh;
+ extern unsigned int tempesi, tempedi, tempedx, tempebp;
+ extern unsigned int SPCMultA, PHnum2writespc7110reg, PHdspsave2;
+-extern unsigned char sndrot[], SPCRAM[65472], DSPMem[256], SA1Status, *SA1RAMArea;
++extern unsigned char sndrot[], SPCRAM[], DSPMem[256], SA1Status, *SA1RAMArea;
+ extern unsigned char DSP1Enable, DSP1COp, prevoamptr, BRRBuffer[], *romdata;
+ extern unsigned char curcyc, echoon0[], spcnumread, NextLineCache, HIRQNextExe;
+ extern unsigned char vidmemch4[4096], vidmemch8[4096], vidmemch2[4096];
+diff --git a/src/initc.c b/src/initc.c
+index 04e6549..f844d4e 100644
+--- a/src/initc.c
++++ b/src/initc.c
+@@ -1390,7 +1390,7 @@ extern unsigned char pal16b[1024];
+ extern unsigned char pal16bcl[1024];
+ extern unsigned char pal16bclha[1024];
+ extern unsigned char pal16bxcl[256];
+-extern unsigned char SPCRAM[65472];
++extern unsigned char SPCRAM[];
+ 
+ extern unsigned char *sram;
+ extern unsigned char *vidbuffer;
+-- 
+2.26.2
+
