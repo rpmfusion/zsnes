@@ -4,7 +4,7 @@
 Summary: A Super Nintendo emulator
 Name: zsnes
 Version: 1.51
-Release: 29%{?dist}
+Release: 30%{?dist}
 License: GPLv2
 URL: http://www.zsnes.com/
 Source: http://dl.sf.net/%{name}/%{name}%{pkgversion}src.tar.bz2
@@ -39,6 +39,8 @@ Patch11: zsnes-1.51-gcc10.patch
 # Mamoru TASAKA
 # https://bugzilla.rpmfusion.org/show_bug.cgi?id=5651
 Patch12: zsnes-1.51-FORTIFY_SOURCE_2.patch
+# Again FORTIFY_SOURCE, this time with LTO
+Patch13: zsnes-1.51-FORTIFY_SOURCE_3.patch
 
 # This is to build only for ix86 on plague
 #ExclusiveArch: %{ix86}
@@ -79,12 +81,18 @@ and to save the game state, even network play is possible.
 %patch10 -p0
 %patch11 -p1
 %patch12 -p2
+%patch13 -p2
 
 # Remove hardcoded CFLAGS and LDFLAGS
 sed -i \
   -e 's:^\s*CFLAGS=.* -D__RELEASE__.*$:CFLAGS="$CFLAGS -D__RELEASE__":' \
   -e 's:^\s*CFLAGS=.* -I\/usr\/local\/include .*$:CFLAGS="${CFLAGS} -I.":' \
   -e '/^\s*LDFLAGS=.* -L\/usr\/local\/lib /d' \
+  configure.in
+
+# Enable debug information for nasm
+sed -i \
+  -e '\@^NFLAGS=@s|\$NFLAGS |\$NFLAGS -g |' \
   configure.in
 
 # Fix line encodings in docs/readme.txt/*
@@ -145,6 +153,9 @@ done
 
 
 %changelog
+* Sat Nov  7 2020 Mamoru TASAKA <mtasaka@fedoraproject.org> - 1.51-30
+- Another FORTIFY_SOURCE issue patch, this time with LTO (#5790)
+
 * Wed Aug 19 2020 RPM Fusion Release Engineering <leigh123linux@gmail.com> - 1.51-29
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 

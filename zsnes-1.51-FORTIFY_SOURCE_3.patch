@@ -1,0 +1,32 @@
+From 747bc1c34fee9b3e4c62a7bde177cb48bf20b97e Mon Sep 17 00:00:00 2001
+From: Mamoru TASAKA <mtasaka@fedoraproject.org>
+Date: Sat, 10 Oct 2020 15:14:56 +0900
+Subject: [PATCH] Unspecify the size of SPCRAM in debugger.c to make
+ _FORTIFY_SOURCE and LTO happy
+
+https://bugzilla.rpmfusion.org/show_bug.cgi?id=5790
+
+With LTO (link-time optimization), again the compiler thinks the size of SPCRAM is
+65472 (as written in debugger.c), so with _FORTIFY_SOURCE, glibc thinks again
+buffer overrun occured as written on
+https://bugzilla.rpmfusion.org/show_bug.cgi?id=5651
+---
+ src/debugger.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/debugger.c b/src/debugger.c
+index 30997c8..98ea799 100644
+--- a/src/debugger.c
++++ b/src/debugger.c
+@@ -36,7 +36,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ 
+ // All of these should be in headers, people!
+ 
+-extern unsigned char oamram[1024], SPCRAM[65472], DSPMem[256];
++extern unsigned char oamram[1024], SPCRAM[], DSPMem[256];
+ 
+ extern unsigned char curblank;
+ extern unsigned char curcyc;
+-- 
+2.28.0
+
