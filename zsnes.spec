@@ -4,7 +4,7 @@
 Summary: A Super Nintendo emulator
 Name: zsnes
 Version: 1.51
-Release: 31%{?dist}
+Release: 32%{?dist}
 License: GPLv2
 URL: http://www.zsnes.com/
 Source: http://dl.sf.net/%{name}/%{name}%{pkgversion}src.tar.bz2
@@ -59,8 +59,6 @@ BuildRequires: desktop-file-utils
 Requires: hicolor-icon-theme
 # Require pulseaudio-libs.i686 under x86_64
 Requires: pulseaudio-libs%{?_isa}
-# Require mesa-dri-drivers.i686 under x86_64
-Requires: mesa-dri-drivers%{?_isa}
 
 %description
 This is an emulator for Nintendo's 16 bit console, called Super Nintendo 
@@ -155,6 +153,9 @@ done
 
 
 %changelog
+* Sun Nov 22 12:03:53 CET 2020 Andrea Musuruane <musuruan@gmail.com> - 1.51-32
+- Reverting last change
+
 * Sat Nov 21 17:57:29 CET 2020 Andrea Musuruane <musuruan@gmail.com> - 1.51-31
 - Added mesa-dri-drivers to Requires (#5791)
 
