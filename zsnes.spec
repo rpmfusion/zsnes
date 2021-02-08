@@ -4,7 +4,7 @@
 Summary: A Super Nintendo emulator
 Name: zsnes
 Version: 1.51
-Release: 33%{?dist}
+Release: 34%{?dist}
 License: GPLv2
 URL: http://www.zsnes.com/
 Source: http://dl.sf.net/%{name}/%{name}%{pkgversion}src.tar.bz2
@@ -108,6 +108,9 @@ mv ../docs/readme.txt/support.txt.utf8 ../docs/readme.txt/support.txt
 sed -i -e 's/^Icon=%{name}.png$/Icon=%{name}/g' \
   linux/%{name}.desktop
 
+# Use -std=gnu++14 for CXX source for now, this is not ready for C++17
+sed -i configure.in \
+  -e '\@CXXFLAGS=@s|CFLAGS|CFLAGS -std=gnu++14 |'
 
 %build
 aclocal
@@ -153,6 +156,9 @@ done
 
 
 %changelog
+* Mon Feb  8 2021 Mamoru TASAKA <mtasaka@fedoraproject.org> - 1.51-34
+- Use C++14 for now to workaround FTBFS
+
 * Thu Feb 04 2021 RPM Fusion Release Engineering <leigh123linux@gmail.com> - 1.51-33
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
 
