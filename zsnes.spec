@@ -69,19 +69,19 @@ and to save the game state, even network play is possible.
 
 %prep
 %setup -q -n %{name}_%{pkgsubdir}/src
-%patch1 -p2
-%patch2 -p2
-%patch3 -p2
-%patch4 -p2
-%patch5 -p2
-%patch6 -p2
-%patch7 -p2
-%patch8 -p2
-%patch9 -p2
-%patch10 -p0
-%patch11 -p1
-%patch12 -p2
-%patch13 -p2
+%patch -P1 -p2
+%patch -P2 -p2
+%patch -P3 -p2
+%patch -P4 -p2
+%patch -P5 -p2
+%patch -P6 -p2
+%patch -P7 -p2
+%patch -P8 -p2
+%patch -P9 -p2
+%patch -P10 -p0
+%patch -P11 -p1
+%patch -P12 -p2
+%patch -P13 -p2
 
 # Remove hardcoded CFLAGS and LDFLAGS
 sed -i \
