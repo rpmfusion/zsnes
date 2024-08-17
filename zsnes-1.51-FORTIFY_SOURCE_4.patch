@@ -1,0 +1,57 @@
+From dd0c1da2f2d8bc5df11cc9b443bf3e7c79926ac7 Mon Sep 17 00:00:00 2001
+From: Mamoru TASAKA <mtasaka@fedoraproject.org>
+Date: Sat, 17 Aug 2024 12:31:15 +0900
+Subject: [PATCH] Fix the size of pal16bxcl
+
+With Fedora 41, zsnes again causes SIGABRT with FORTIFY_SOURCE
+as:
+
+```
+*** buffer overflow detected ***: terminated
+
+Program received signal SIGABRT, Aborted.
+gdb) bt
+#0  0xf7fc5589 in __kernel_vsyscall ()
+#1  0xf7930ecf in __pthread_kill_implementation () from /lib/libc.so.6
+#2  0xf78d7061 in raise () from /lib/libc.so.6
+#3  0xf78be298 in abort () from /lib/libc.so.6
+#4  0xf78bf2de in __libc_message_impl.cold () from /lib/libc.so.6
+#5  0xf79c414f in __fortify_fail () from /lib/libc.so.6
+#6  0xf79c3b7b in __chk_fail () from /lib/libc.so.6
+#7  0x5656248d in memset (__dest=0x569a8eb0, __ch=255, __len=2) at /usr/include/bits/string_fortified.h:59
+#8  clearmem () at initc.c:1460
+#9  0x5655e0ec in init[rbackupl] () at init.asm:119
+#10 0xf7ffcb60 in ?? () from /lib/ld-linux.so.2
+#11 0xf78bfd43 in __libc_start_call_main () from /lib/libc.so.6
+#12 0xcae6f600 in ?? ()
+(gdb) up 8
+#8  clearmem () at initc.c:1460
+1460	    memset(pal16bxcl+i, 255, 2);
+```
+
+This is because gcc/glibc sees that pal16bxcl[] has the size of
+1024, and clearmem() function exceeds this size.
+endmem.asm declares pal16bxcl as "resd 256", which has actually
+256*4 = 1024 bytes.
+
+Correctly declare the size of pal16bxcl.
+---
+ src/initc.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/initc.c b/src/initc.c
+index a1c80bc..568ec9b 100644
+--- a/src/initc.c
++++ b/src/initc.c
+@@ -1389,7 +1389,7 @@ extern unsigned char vidmemch8[4096];
+ extern unsigned char pal16b[1024];
+ extern unsigned char pal16bcl[1024];
+ extern unsigned char pal16bclha[1024];
+-extern unsigned char pal16bxcl[256];
++extern unsigned char pal16bxcl[1024];
+ extern unsigned char SPCRAM[];
+ 
+ extern unsigned char *sram;
+-- 
+2.46.0
+

@@ -4,7 +4,7 @@
 Summary: A Super Nintendo emulator
 Name: zsnes
 Version: 1.51
-Release: 40%{?dist}
+Release: 41%{?dist}
 License: GPLv2
 URL: http://www.zsnes.com/
 Source: http://dl.sf.net/%{name}/%{name}%{pkgversion}src.tar.bz2
@@ -41,6 +41,8 @@ Patch11: zsnes-1.51-gcc10.patch
 Patch12: zsnes-1.51-FORTIFY_SOURCE_2.patch
 # Again FORTIFY_SOURCE, this time with LTO
 Patch13: zsnes-1.51-FORTIFY_SOURCE_3.patch
+# Again FORTIFY_SOURCE, for pal16bxcl
+Patch14: zsnes-1.51-FORTIFY_SOURCE_4.patch
 
 # This is to build only for ix86 on plague
 #ExclusiveArch: %{ix86}
@@ -82,6 +84,7 @@ and to save the game state, even network play is possible.
 %patch -P11 -p1
 %patch -P12 -p2
 %patch -P13 -p2
+%patch -P14 -p2
 
 # Remove hardcoded CFLAGS and LDFLAGS
 sed -i \
@@ -156,6 +159,9 @@ done
 
 
 %changelog
+* Sat Aug 17 2024 Mamoru TASAKA <mtasaka@fedoraproject.org> - 1.51-41
+- Again fix SIGABRT with FORTIFY_SOURCE
+
 * Fri Aug 02 2024 RPM Fusion Release Engineering <sergiomb@rpmfusion.org> - 1.51-40
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
 
