@@ -1,0 +1,47 @@
+From c4464bdbdcc894617ecad093f76bec9cba9e0c73 Mon Sep 17 00:00:00 2001
+From: Mamoru TASAKA <mtasaka@fedoraproject.org>
+Date: Thu, 30 Jan 2025 21:05:49 +0900
+Subject: [PATCH] C23: avoid keyword bool usage
+
+---
+ chips/dsp3emu.c | 4 +---
+ chips/obc1emu.c | 1 -
+ 2 files changed, 1 insertion(+), 4 deletions(-)
+
+diff --git a/chips/dsp3emu.c b/chips/dsp3emu.c
+index 0241f67..dc96486 100644
+--- a/chips/dsp3emu.c
++++ b/chips/dsp3emu.c
+@@ -27,8 +27,6 @@ typedef char int8;
+ typedef short int16;
+ typedef long int32;
+ 
+-//C++ in C
+-typedef unsigned char bool;
+ #define true 1
+ #define false 0
+ 
+@@ -377,7 +375,7 @@ void DSP3_Convert()
+ 	SetDSP3 = &DSP3_Convert_A;
+ }
+ 
+-bool DSP3_GetBits(uint8 Count)
++bool8 DSP3_GetBits(uint8 Count)
+ {
+ 	if (!DSP3_BitsLeft)
+ 	{
+diff --git a/chips/obc1emu.c b/chips/obc1emu.c
+index 96cd7f1..cdbd38e 100644
+--- a/chips/obc1emu.c
++++ b/chips/obc1emu.c
+@@ -28,7 +28,6 @@ typedef short int16;
+ typedef long int32;
+ 
+ //C++ in C
+-typedef unsigned char bool;
+ #define true 1
+ #define false 0
+ 
+-- 
+2.48.1
+

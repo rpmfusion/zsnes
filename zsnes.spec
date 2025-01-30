@@ -4,7 +4,7 @@
 Summary: A Super Nintendo emulator
 Name: zsnes
 Version: 1.51
-Release: 42%{?dist}
+Release: 43%{?dist}
 License: GPLv2
 URL: http://www.zsnes.com/
 Source: http://dl.sf.net/%{name}/%{name}%{pkgversion}src.tar.bz2
@@ -43,6 +43,10 @@ Patch12: zsnes-1.51-FORTIFY_SOURCE_2.patch
 Patch13: zsnes-1.51-FORTIFY_SOURCE_3.patch
 # Again FORTIFY_SOURCE, for pal16bxcl
 Patch14: zsnes-1.51-FORTIFY_SOURCE_4.patch
+# C23: avoid keyword bool usage
+Patch15: zsnes-1.51-C23-avoid-keyword-bool-usage.patch
+# C++17: remove dynamic exception specifications
+Patch16: zsnes-1.51-cpp17-remove-dynamic-exception-specifications.patch
 
 # This is to build only for ix86 on plague
 #ExclusiveArch: %{ix86}
@@ -85,6 +89,8 @@ and to save the game state, even network play is possible.
 %patch -P12 -p2
 %patch -P13 -p2
 %patch -P14 -p2
+%patch -P15 -p1
+%patch -P16 -p1
 
 # Remove hardcoded CFLAGS and LDFLAGS
 sed -i \
@@ -110,10 +116,6 @@ mv ../docs/readme.txt/support.txt.utf8 ../docs/readme.txt/support.txt
 #  Remove icon extension from desktop file
 sed -i -e 's/^Icon=%{name}.png$/Icon=%{name}/g' \
   linux/%{name}.desktop
-
-# Use -std=gnu++14 for CXX source for now, this is not ready for C++17
-sed -i configure.in \
-  -e '\@CXXFLAGS=@s|CFLAGS|CFLAGS -std=gnu++14 |'
 
 %build
 aclocal
@@ -159,6 +161,10 @@ done
 
 
 %changelog
+* Thu Jan 30 2025 Mamoru TASAKA <mtasaka@fedoraproject.org> - 1.51-43
+- Support C23: avoid keyword bool usage
+- Support C++17: remove dynamic exception specifications
+
 * Wed Jan 29 2025 RPM Fusion Release Engineering <sergiomb@rpmfusion.org> - 1.51-42
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_42_Mass_Rebuild
 
