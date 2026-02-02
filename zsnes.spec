@@ -54,7 +54,7 @@ ExclusiveArch: i686
 BuildRequires: gcc-c++
 BuildRequires: automake
 BuildRequires: nasm
-BuildRequires: SDL-devel >= 1.2.0
+BuildRequires: sdl12-compat-devel >= 1.2.0
 BuildRequires: zlib-devel >= 1.2.3
 BuildRequires: libpng-devel >= 1.2.0
 BuildRequires: libGL-devel
