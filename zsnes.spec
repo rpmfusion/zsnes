@@ -118,6 +118,7 @@ sed -i -e 's/^Icon=%{name}.png$/Icon=%{name}/g' \
   linux/%{name}.desktop
 
 %build
+export LDFLAGS+=' -Wl,-z,notext'
 aclocal
 autoconf
 %configure \
